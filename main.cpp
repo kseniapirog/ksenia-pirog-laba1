@@ -1,81 +1,203 @@
-#include <iostream>
+#include <iostream> 
 
-namespace {
-    const int MINUTES_IN_HOUR = 60;
-    const int HOURS_IN_HALF_DAY = 12;
-    const int MORNING_START = 5;
-    const int DAY_START = 12;
-    const int EVENING_START = 18;
-    const int MIDNIGHT = 0;
-    const int NOON = 12;
-    const int MAX_HOURS = 24;
-    const int MAX_MINUTES = 60;
-}
+ 
 
-int getDayPart(int hours) {
-    if (hours >= MIDNIGHT && hours < MORNING_START) return 0;
-    if (hours >= MORNING_START && hours < DAY_START) return 1;
-    if (hours > DAY_START && hours < EVENING_START) return 2;
-    return 3;
-}
+namespace { 
 
-const char* getDayPartName(int part) {
-    if (part == 0) return "ночи";
-    if (part == 1) return "утра";
-    if (part == 2) return "дня";
-    return "вечера";
-}
+    const int MIN_HOUR = 0; 
 
-const char* getHourWord(int h) {
-    int last = h % 10;
-    int lastTwo = h % 100;
-    if (lastTwo >= 11 && lastTwo <= 14) return "часов";
-    if (last == 1) return "час";
-    if (last >= 2 && last <= 4) return "часа";
-    return "часов";
-}
+    const int MAX_HOUR = 23; 
 
-const char* getMinuteWord(int m) {
-    int last = m % 10;
-    int lastTwo = m % 100;
-    if (lastTwo >= 11 && lastTwo <= 14) return "минут";
-    if (last == 1) return "минута";
-    if (last >= 2 && last <= 4) return "минуты";
-    return "минут";
-}
+    const int MIN_MINUTE = 0; 
 
-int main() {
-    int hours = 0;
-    int minutes = 0;
-    std::cin >> hours >> minutes;
+    const int MAX_MINUTE = 59; 
 
-    if (hours < 0 || hours >= MAX_HOURS || minutes < 0 || minutes >= MAX_MINUTES) {
-        std::cout << "введены недопустимые данные" << std::endl;
-        return 0;
-    }
+     
 
-    if (hours == 0 && minutes == 0) {
-        std::cout << "полночь" << std::endl;
-        return 0;
-    }
+    const int MORNING_START = 5; 
 
-    if (hours == 12 && minutes == 0) {
-        std::cout << "полдень" << std::endl;
-        return 0;
-    }
+    const int DAY_START = 12; 
 
-    int part = getDayPart(hours);
-    int displayHours = hours % HOURS_IN_HALF_DAY;
-    if (displayHours == 0) displayHours = HOURS_IN_HALF_DAY;
+    const int EVENING_START = 18; 
 
-    std::cout << displayHours << " " << getHourWord(displayHours);
+     
 
-    if (minutes == 0) {
-        std::cout << " " << getDayPartName(part) << " ровно" << std::endl;
-    } else {
-        std::cout << " " << minutes << " " << getMinuteWord(minutes)
-                  << " " << getDayPartName(part) << std::endl;
-    }
+    const int HOURS_PER_HALF_DAY = 12; 
 
-    return 0;
-}
+} 
+
+ 
+
+void printHourWord(int hour) { 
+
+    int lastDigit = hour % 10; 
+
+    int lastTwoDigits = hour % 100; 
+
+     
+
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 12) { 
+
+        std::cout << "часов"; 
+
+    } else if (lastDigit == 1) { 
+
+        std::cout << "час"; 
+
+    } else if (lastDigit >= 2 && lastDigit <= 4) { 
+
+        std::cout << "часа"; 
+
+    } else { 
+
+        std::cout << "часов"; 
+
+    } 
+
+} 
+
+ 
+
+void printMinuteWord(int minute) { 
+
+    int lastDigit = minute % 10; 
+
+    int lastTwoDigits = minute % 100; 
+
+     
+
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 14) { 
+
+        std::cout << "минут"; 
+
+    } else if (lastDigit == 1) { 
+
+        std::cout << "минута"; 
+
+    } else if (lastDigit >= 2 && lastDigit <= 4) { 
+
+        std::cout << "минуты"; 
+
+    } else { 
+
+        std::cout << "минут"; 
+
+    } 
+
+} 
+
+ 
+
+void printTimeOfDay(int hour) { 
+
+    if (hour >= MIN_HOUR && hour < MORNING_START) { 
+
+        std::cout << "ночи"; 
+
+    } else if (hour >= MORNING_START && hour < DAY_START) { 
+
+        std::cout << "утра"; 
+
+    } else if (hour >= DAY_START && hour < EVENING_START) { 
+
+        std::cout << "дня"; 
+
+    } else { 
+
+        std::cout << "вечера"; 
+
+    } 
+
+} 
+
+ 
+
+int main() { 
+
+    int hour, minute; 
+
+ 
+
+    std::cout << "Введите часы \n"; 
+
+    std::cin >> hour; 
+
+    std::cout << "Введите минуты \n" ; 
+
+    std::cin >> minute; 
+
+     
+
+    if (hour < MIN_HOUR || hour > MAX_HOUR || minute < MIN_MINUTE || minute > MAX_MINUTE) { 
+
+        std::cout << "введены недопустимые данные \n"; 
+
+        return 0; 
+
+    } 
+
+     
+
+    if (hour == MIN_HOUR && minute == MIN_MINUTE) { 
+
+        std::cout << "полночь \n"; 
+
+        return 0; 
+
+    } 
+
+     
+
+    if (hour == DAY_START && minute == MIN_MINUTE) { 
+
+        std::cout << "полдень \n"; 
+
+        return 0; 
+
+    } 
+
+     
+
+    int displayHour = hour % HOURS_PER_HALF_DAY; 
+
+    if (displayHour == MIN_HOUR) { 
+
+        displayHour = HOURS_PER_HALF_DAY; 
+
+    } 
+
+     
+
+    std::cout << displayHour << " "; 
+
+    printHourWord(displayHour); 
+
+    std::cout << " "; 
+
+     
+
+    if (minute == MIN_MINUTE) { 
+
+        printTimeOfDay(hour); 
+
+        std::cout << " ровно"; 
+
+    } else { 
+
+        std::cout << minute << " "; 
+
+        printMinuteWord(minute); 
+
+        std::cout << " "; 
+
+        printTimeOfDay(hour); 
+
+    } 
+
+     
+
+    std::cout << "\n"; 
+
+    return 0; 
+
+} 
