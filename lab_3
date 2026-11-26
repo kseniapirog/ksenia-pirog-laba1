@@ -1,0 +1,172 @@
+#include "lab3.h"
+#include <cmath>
+#include <iomanip>
+
+namespace {
+
+    const int N_MAX = 100000;
+
+    double f(double x, double k) {
+        return x - k * std::cos(x);
+    }
+
+    double fDerivative(double x, double k) {
+        return 1.0 + k * std::sin(x);
+    }
+
+    double phi(double x, double k) {
+        return k * std::cos(x);
+    }
+
+} 
+
+namespace lab3 {
+
+    [[nodiscard]] Task showMenu() {
+        std::cout << "\n=== Меню ===\n";
+        std::cout << "1. Метод итераций\n";
+        std::cout << "2. Метод половинного деления\n";
+        std::cout << "3. Метод Ньютона\n";
+        std::cout << "0. Выход\n";
+        std::cout << "Выбор: ";
+
+        int choice = 0;
+        std::cin >> choice;
+        return static_cast<Task>(choice);
+    }
+
+    void runApplication() {
+        bool running = true;
+        while (running) {
+            Task task = showMenu();
+            switch (task) {
+            case Task::Iteration: taskIteration(); break;
+            case Task::Bisection: taskBisection(); break;
+            case Task::Newton:    taskNewton();    break;
+            case Task::Exit:
+                running = false;
+                std::cout << "Выход.\n";
+                break;
+            default:
+                std::cout << "Неверный выбор.\n";
+                break;
+            }
+        }
+    }
+
+    void taskIteration() {
+        std::cout << "\n--- Метод итераций ---\n";
+        std::cout << "Уравнение: x - k*cos(x) = 0\n";
+
+        double k = 1.0;
+        std::cout << "Коэффициент k: ";
+        std::cin >> k;
+
+        double eps = 1e-6;
+        std::cout << "Погрешность (1e-6, 1e-8): ";
+        std::cin >> eps;
+
+        double x = 0.0;
+        std::cout << "Начальное приближение x0: ";
+        std::cin >> x;
+
+        int n = 0;
+        double xNew = phi(x, k);
+        while (std::fabs(xNew - x) > eps && n < N_MAX) {
+            x = xNew;
+            xNew = phi(x, k);
+            n++;
+        }
+
+        std::cout << std::fixed << std::setprecision(6);
+        std::cout << "Корень: " << xNew << "\n";
+        std::cout << "Итераций: " << n << "\n";
+        std::cout << "f(x) = " << f(xNew, k) << "\n";
+    }
+
+    void taskBisection() {
+        std::cout << "\n--- Метод половинного деления ---\n";
+        std::cout << "Уравнение: x - k*cos(x) = 0\n";
+
+        double k = 1.0;
+        std::cout << "Коэффициент k: ";
+        std::cin >> k;
+
+        double eps = 1e-6;
+        std::cout << "Погрешность: ";
+        std::cin >> eps;
+
+        double a, b;
+        std::cout << "Левая граница a: ";
+        std::cin >> a;
+        std::cout << "Правая граница b: ";
+        std::cin >> b;
+
+        double fa = f(a, k);
+        double fb = f(b, k);
+
+        if (fa * fb > 0) {
+            std::cout << "На концах отрезка функция одного знака. Корень не найден.\n";
+            return;
+        }
+
+        int n = 0;
+        double mid = 0.0;
+        while ((b - a) > eps && n < N_MAX) {
+            mid = (a + b) / 2.0;
+            double fmid = f(mid, k);
+            if (fmid == 0.0) break;
+            if (fa * fmid < 0) {
+                b = mid;
+                fb = fmid;
+            }
+            else {
+                a = mid;
+                fa = fmid;
+            }
+            n++;
+        }
+
+        std::cout << std::fixed << std::setprecision(6);
+        std::cout << "Корень: " << mid << "\n";
+        std::cout << "Итераций: " << n << "\n";
+        std::cout << "f(x) = " << f(mid, k) << "\n";
+    }
+
+    void taskNewton() {
+        std::cout << "\n--- Метод Ньютона ---\n";
+        std::cout << "Уравнение: x - k*cos(x) = 0\n";
+
+        double k = 1.0;
+        std::cout << "Коэффициент k: ";
+        std::cin >> k;
+
+        double eps = 1e-6;
+        std::cout << "Погрешность: ";
+        std::cin >> eps;
+
+        double x = 0.0;
+        std::cout << "Начальное приближение x0: ";
+        std::cin >> x;
+
+        int n = 0;
+        double xNew = x;
+        do {
+            x = xNew;
+            double fx = f(x, k);
+            double dfx = fDerivative(x, k);
+            if (std::fabs(dfx) < 1e-15) {
+                std::cout << "Производная близка к нулю.\n";
+                break;
+            }
+            xNew = x - fx / dfx;
+            n++;
+        } while (std::fabs(xNew - x) > eps && n < N_MAX);
+
+        std::cout << std::fixed << std::setprecision(6);
+        std::cout << "Корень: " << xNew << "\n";
+        std::cout << "Итераций: " << n << "\n";
+        std::cout << "f(x) = " << f(xNew, k) << "\n";
+    }
+
+}
