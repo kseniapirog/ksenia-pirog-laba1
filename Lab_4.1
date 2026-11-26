@@ -1,0 +1,129 @@
+#include "lab4.h"
+#include <random>
+#include <iomanip>
+#include <algorithm>
+
+namespace {
+
+    const std::size_t N = 7;
+
+    int randInt() {
+        static std::default_random_engine gen(std::random_device{}());
+        static std::uniform_int_distribution<int> d(0, 99);
+        return d(gen);
+    }
+
+    void print(const int* a, std::size_t n) {
+        for (std::size_t i = 0; i < n; ++i)
+            std::cout << a[i] << (i + 1 < n ? ", " : "\n");
+    }
+
+    void selSort(int* a, std::size_t n, bool asc, std::size_t& c, std::size_t& s) {
+        c = s = 0;
+        for (std::size_t i = 0; i < n - 1; ++i) {
+            std::size_t k = i;
+            for (std::size_t j = i + 1; j < n; ++j) {
+                ++c;
+                if ((asc ? a[j] < a[k] : a[j] > a[k])) k = j;
+            }
+            if (k != i) { std::swap(a[i], a[k]); ++s; }
+        }
+    }
+
+    void bubSort(int* a, std::size_t n, bool asc, std::size_t& c, std::size_t& s) {
+        c = s = 0;
+        for (std::size_t i = 0; i < n - 1; ++i) {
+            bool sw = false;
+            for (std::size_t j = 0; j < n - 1 - i; ++j) {
+                ++c;
+                if ((asc ? a[j] > a[j + 1] : a[j] < a[j + 1])) {
+                    std::swap(a[j], a[j + 1]); ++s; sw = true;
+                }
+            }
+            if (!sw) break;
+        }
+    }
+
+    void table(const char* lbl, std::size_t sC, std::size_t sS, std::size_t bC, std::size_t bS) {
+        std::cout << lbl << "\n" << std::left
+            << std::setw(18) << "Метод" << std::setw(14) << "Сравнений" << std::setw(14) << "Перестановок" << "\n"
+            << std::string(46, '-') << "\n"
+            << std::setw(18) << "Selection Sort" << std::setw(14) << sC << std::setw(14) << sS << "\n"
+            << std::setw(18) << "Bubble Sort" << std::setw(14) << bC << std::setw(14) << bS << "\n\n";
+    }
+
+    void run(int* arr, std::size_t n, const char* pfx) {
+        int* a = new int[n], * b = new int[n];
+        std::size_t sC, sS, bC, bS;
+
+        std::cout << "Исходный: "; print(arr, n);
+        std::copy(arr, arr + n, a); std::copy(arr, arr + n, b);
+        selSort(a, n, true, sC, sS); bubSort(b, n, true, bC, bS);
+        std::cout << "По возрастанию: "; print(a, n);
+        table((std::string(pfx) + " — по возрастанию (исходный)").c_str(), sC, sS, bC, bS);
+
+        selSort(a, n, true, sC, sS); bubSort(b, n, true, bC, bS);
+        std::cout << "Повторно: "; print(a, n);
+        table((std::string(pfx) + " — по возрастанию (повторно)").c_str(), sC, sS, bC, bS);
+
+        selSort(a, n, false, sC, sS); bubSort(b, n, false, bC, bS);
+        std::cout << "По убыванию: "; print(a, n);
+        table((std::string(pfx) + " — по убыванию").c_str(), sC, sS, bC, bS);
+
+        delete[] a; delete[] b;
+    }
+
+} 
+
+namespace lab4 {
+
+    [[nodiscard]] Task showMenu() {
+        std::cout << "\n=== Меню ===\n1. Статический\n2. Динамический\n0. Выход\nВыбор: ";
+        int c; std::cin >> c;
+        return static_cast<Task>(c);
+    }
+
+    void runApplication() {
+        bool r = true;
+        while (r) {
+            switch (showMenu()) {
+            case Task::StaticArray:  taskStaticArray();  break;
+            case Task::DynamicArray: taskDynamicArray(); break;
+            case Task::Exit: r = false; std::cout << "Выход.\n"; break;
+            default: std::cout << "Неверный выбор.\n";
+            }
+        }
+    }
+
+    void taskStaticArray() {
+        std::cout << "\n--- Статический (" << N << ") ---\n";
+        int arr[N];
+        for (std::size_t i = 0; i < N; ++i) arr[i] = randInt();
+        run(arr, N, "Статический");
+    }
+
+    void taskDynamicArray() {
+        std::cout << "\n--- Динамический ---\nРазмер: ";
+        std::size_t n; std::cin >> n;
+        if (!n) { std::cout << "Размер > 0\n"; return; }
+
+        int* arr = new int[n];
+        for (std::size_t i = 0; i < n; ++i) arr[i] = randInt();
+
+        std::cout << "Исходный: "; print(arr, n);
+        std::cout << "1 — по возрастанию, 2 — по убыванию: ";
+        int o; std::cin >> o;
+        bool asc = (o == 1);
+
+        int* a = new int[n], * b = new int[n];
+        std::size_t sC, sS, bC, bS;
+        std::copy(arr, arr + n, a); std::copy(arr, arr + n, b);
+        selSort(a, n, asc, sC, sS); bubSort(b, n, asc, bC, bS);
+
+        std::cout << "Отсортированный: "; print(a, n);
+        table("Динамический", sC, sS, bC, bS);
+
+        delete[] arr; delete[] a; delete[] b;
+    }
+
+}
