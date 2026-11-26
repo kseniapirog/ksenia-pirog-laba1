@@ -1,0 +1,14 @@
+#pragma once
+#include <iostream>
+#include <cstddef>
+
+namespace lab4 {
+
+ enum class Task { StaticArray = 1, DynamicArray = 2, Exit = 0 };
+
+ [[nodiscard]] Task showMenu();
+ void runApplication();
+ void taskStaticArray();
+ void taskDynamicArray();
+
+}
