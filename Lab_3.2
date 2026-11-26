@@ -1,0 +1,21 @@
+#pragma once
+#include <iostream>
+
+namespace lab3 {
+
+    enum class Task {
+        Iteration = 1,
+        Bisection = 2,
+        Newton = 3,
+        Exit = 0
+    };
+
+    [[nodiscard]] Task showMenu();
+    void runApplication();
+
+    void taskIteration();
+    void taskBisection();
+    void taskNewton();
+
+} 
+
